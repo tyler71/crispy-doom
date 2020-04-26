@@ -1,0 +1,25 @@
+name: Ubuntu based build
+on:
+  release:
+    types: 
+      - published
+  
+jobs:
+    build-app:
+      runs-on: ubuntu-latest
+      steps:
+      - name: Build Cripsy Doom
+        uses: docker://tyler71/cripsy-doom:latest
+      
+      - name: Zip files
+        run: find -type f -iname 'crispy-*' -executable -exec zip -8 --junk-paths cripsy.doom.zip {} +
+
+      - name: Upload Compiled Asset
+        uses: actions/upload-release-asset@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ./cripsy.doom.zip
+          asset_name: cripsy.doom.zip
+          asset_content_type: application/zip
